@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全网热榜</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system, sans-serif; background:#f5f5f5; padding:16px; }
+    .header { background:linear-gradient(135deg,#667eea,#764ba2); color:white; padding:20px; border-radius:12px; margin-bottom:16px; text-align:center; }
+    .header h2 { font-size:22px; }
+    .item { background:white; padding:14px 16px; margin-bottom:8px; border-radius:10px; display:flex; align-items:center; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+    .rank { font-size:18px; font-weight:bold; color:#e74c3c; width:30px; }
+    .content { flex:1; }
+    .title { font-size:16px; font-weight:500; color:#2c3e50; }
+    .meta { font-size:12px; color:#95a5a6; margin-top:4px; }
+    .score { font-weight:bold; color:#f39c12; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>📡 全网热榜（加权聚合）</h2>
+    <p style="font-size:13px;opacity:0.9;">微博·百度·知乎 · 每日更新</p>
+  </div>
+  <div id="list">加载中...</div>
+  <script>
+    fetch('hot_ranking.json')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('list');
+        if (!data.length) {
+          list.innerHTML = '<p style="text-align:center;color:#999;">暂无数据</p>';
+          return;
+        }
+        list.innerHTML = data.slice(0, 30).map((item, i) => `
+          <div class="item">
+            <span class="rank">${i + 1}</span>
+            <div class="content">
+              <div class="title">${item.title}</div>
+              <div class="meta">来源：${item.sources.join('、')} ｜ 综合热度 <span class="score">${item.total_score.toFixed(2)}</span></div>
+            </div>
+          </div>
+        `).join('');
+      })
+      .catch(() => {
+        document.getElementById('list').innerHTML = '<p style="color:red;">加载失败，请刷新</p>';
+      });
+  </script>
+</body>
+</html>
