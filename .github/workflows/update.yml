@@ -1,8 +1,8 @@
 name: 更新热榜
 on:
   schedule:
-    - cron: '0 0 * * *'   # UTC 0点 = 北京时间早8点
-  workflow_dispatch:       # 允许手动触发
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
 
       - name: 安装 Python
         uses: actions/setup-python@v4
@@ -24,12 +22,11 @@ jobs:
       - name: 运行脚本
         run: python hot.py
 
-      - name: 提交更新
+      - name: 强制推送
         run: |
           git config --global user.email "bot@github.com"
           git config --global user.name "HotRank Bot"
           git add hot_ranking.json
-          git diff --quiet && git diff --staged --quiet && exit 0
+          git diff --staged --quiet && exit 0
           git commit -m "每日自动更新"
-          git pull --rebase origin main
-          git push origin main
+          git push origin main --force
