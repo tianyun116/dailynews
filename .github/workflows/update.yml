@@ -1,26 +1,35 @@
-name: Update Hot Ranking
+name: 更新热榜
 on:
   schedule:
-    - cron: '0 0 * * *'   # UTC 0点，北京时间8点
-  workflow_dispatch:      # 允许手动触发
+    - cron: '0 0 * * *'   # UTC 0点 = 北京时间早8点
+  workflow_dispatch:       # 允许手动触发
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 检出代码
         uses: actions/checkout@v3
-      - name: Setup Python
+        with:
+          fetch-depth: 1
+
+      - name: 安装 Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-      - name: Install dependencies
+
+      - name: 安装依赖
         run: pip install requests
-      - name: Run script
+
+      - name: 运行脚本
         run: python hot.py
-      - name: Commit and push changes
+
+      - name: 提交更新
         run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
+          git config --global user.email "bot@github.com"
+          git config --global user.name "HotRank Bot"
           git add hot_ranking.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update" && git push)
+          git diff --quiet && git diff --staged --quiet && exit 0
+          git commit -m "每日自动更新"
+          git pull --rebase origin main
+          git push origin main
